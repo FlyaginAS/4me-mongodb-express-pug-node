@@ -45,7 +45,7 @@ app.get('/api/v1/articles/:title', async (req, res) => {
 
 app.post('/api/v1/articles', async (req, res) => {
   if (!req.body.title || !req.body.author || !req.body.text) {
-    return res.status(400).json({
+    return res.status(404).json({
       status: 'fail',
       message: 'you must write title, name and text of article!',
     });
@@ -59,7 +59,7 @@ app.post('/api/v1/articles', async (req, res) => {
       return item.title === req.body.title;
     }) > -1
   ) {
-    return res.status(400).json({
+    return res.status(404).json({
       status: 'fail',
       message: 'it is dublicate, change title',
     });
@@ -78,7 +78,7 @@ app.post('/api/v1/articles', async (req, res) => {
 
 app.patch('/api/v1/articles/:title', async (req, res) => {
   const patch = req.body;
-  const articles = JSON.parse(
+  let articles = JSON.parse(
     await readFilePro(`${__dirname}/articles.json`, 'utf-8')
   );
   const article = articles.find((item) => {
@@ -87,6 +87,12 @@ app.patch('/api/v1/articles/:title', async (req, res) => {
   const index = articles.findIndex((item) => {
     return item.title === req.params.title;
   });
+  if (index < 0) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'not found article with this title',
+    });
+  }
 
   let newArticle = { ...article, ...patch };
 
@@ -98,6 +104,28 @@ app.patch('/api/v1/articles/:title', async (req, res) => {
     data: {
       newArticle,
     },
+  });
+});
+
+app.delete('/api/v1/articles/:title', async (req, res) => {
+  const title = req.params.title;
+  let articles = JSON.parse(
+    await readFilePro(`${__dirname}/articles.json`, 'utf-8')
+  );
+  const index = articles.findIndex((item) => {
+    return item.title === title;
+  });
+  if (index < 0) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'not found',
+    });
+  }
+  articles.splice(index, 1);
+  await writeFilePro(`${__dirname}/articles.json`, JSON.stringify(articles));
+  res.status(204).json({
+    status: 'success',
+    data: null,
   });
 });
 
