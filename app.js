@@ -9,6 +9,7 @@ const app = express();
 //middlewares*************************************************************
 app.use(express.json());
 app.use(morgan('dev'));
+app.use(express.static(`${__dirname}/public`));
 
 //routes*******************************************************************
 app.use('/api/v1/articles', articleRouter);
