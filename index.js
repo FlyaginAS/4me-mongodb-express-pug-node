@@ -6,9 +6,12 @@ const readFilePro = util.promisify(fs.readFile);
 const writeFilePro = util.promisify(fs.writeFile);
 
 const app = express();
+
+//middlewares
 app.use(express.json());
 
-app.get('/api/v1/articles', async (req, res) => {
+//controllers
+const getAllArticles = async (req, res) => {
   const articles = JSON.parse(
     await readFilePro(`${__dirname}/articles.json`, 'utf-8')
   );
@@ -19,9 +22,8 @@ app.get('/api/v1/articles', async (req, res) => {
       articles,
     },
   });
-});
-
-app.get('/api/v1/articles/:title', async (req, res) => {
+};
+const getArticle = async (req, res) => {
   const articles = JSON.parse(
     await readFilePro(`${__dirname}/articles.json`, 'utf-8')
   );
@@ -41,9 +43,8 @@ app.get('/api/v1/articles/:title', async (req, res) => {
       article,
     },
   });
-});
-
-app.post('/api/v1/articles', async (req, res) => {
+};
+const createArticle = async (req, res) => {
   if (!req.body.title || !req.body.author || !req.body.text) {
     return res.status(404).json({
       status: 'fail',
@@ -74,9 +75,8 @@ app.post('/api/v1/articles', async (req, res) => {
       article,
     },
   });
-});
-
-app.patch('/api/v1/articles/:title', async (req, res) => {
+};
+const updateArticle = async (req, res) => {
   const patch = req.body;
   let articles = JSON.parse(
     await readFilePro(`${__dirname}/articles.json`, 'utf-8')
@@ -105,9 +105,8 @@ app.patch('/api/v1/articles/:title', async (req, res) => {
       newArticle,
     },
   });
-});
-
-app.delete('/api/v1/articles/:title', async (req, res) => {
+};
+const deleteArticle = async (req, res) => {
   const title = req.params.title;
   let articles = JSON.parse(
     await readFilePro(`${__dirname}/articles.json`, 'utf-8')
@@ -127,7 +126,18 @@ app.delete('/api/v1/articles/:title', async (req, res) => {
     status: 'success',
     data: null,
   });
-});
+};
+
+//routes
+app.get('/api/v1/articles', getAllArticles);
+
+app.get('/api/v1/articles/:title', getArticle);
+
+app.post('/api/v1/articles', createArticle);
+
+app.patch('/api/v1/articles/:title', updateArticle);
+
+app.delete('/api/v1/articles/:title', deleteArticle);
 
 const port = 3000;
 app.listen(port, () => {
