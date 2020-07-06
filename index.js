@@ -129,15 +129,12 @@ const deleteArticle = async (req, res) => {
 };
 
 //routes
-app.get('/api/v1/articles', getAllArticles);
-
-app.get('/api/v1/articles/:title', getArticle);
-
-app.post('/api/v1/articles', createArticle);
-
-app.patch('/api/v1/articles/:title', updateArticle);
-
-app.delete('/api/v1/articles/:title', deleteArticle);
+app.route('/api/v1/articles').get(getAllArticles).post(createArticle);
+app
+  .route('/api/v1/articles/:title')
+  .get(getArticle)
+  .patch(updateArticle)
+  .delete(deleteArticle);
 
 const port = 3000;
 app.listen(port, () => {
