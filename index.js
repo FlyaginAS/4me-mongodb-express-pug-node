@@ -9,6 +9,8 @@ const writeFilePro = util.promisify(fs.writeFile);
 
 //create app***************************************************************
 const app = express();
+const articleRouter = express.Router();
+const userRouter = express.Router();
 
 //middlewares*************************************************************
 app.use(express.json());
@@ -169,20 +171,18 @@ const deleteUser = async (req, res) => {
 };
 
 //routes*******************************************************************
+app.use('/api/v1/articles', articleRouter);
+app.use('/api/v1/users', userRouter);
 //Articles
-app.route('/api/v1/articles').get(getAllArticles).post(createArticle);
-app
-  .route('/api/v1/articles/:title')
+articleRouter.route('/').get(getAllArticles).post(createArticle);
+articleRouter
+  .route('/:title')
   .get(getArticle)
   .patch(updateArticle)
   .delete(deleteArticle);
 //Users
-app.route('/api/v1/users').get(getAllUsers).post(createUser);
-app
-  .route('/api/v1/users/:id')
-  .get(getUser)
-  .patch(updateUser)
-  .delete(deleteUser);
+userRouter.route('/').get(getAllUsers).post(createUser);
+userRouter.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
 
 //server******************************************************************
 const port = 3000;
