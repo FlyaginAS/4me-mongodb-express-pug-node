@@ -1,116 +1,99 @@
 const Article = require('../models/articleModel');
 
 exports.getAllArticles = async (req, res) => {
-  const articles = await Article.find();
+  try {
+    const articles = await Article.find();
 
-  res.status(200).json({
-    status: 'success',
-    data: {
-      articles,
-    },
-  });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        articles,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err.message,
+    });
+  }
 };
 exports.getArticle = async (req, res) => {
-  const articles = JSON.parse(
-    await readFilePro(`${__dirname}/../articles.json`, 'utf-8')
-  );
-  const article = articles.find((item) => {
-    if (item.title === req.params.title) return true;
-    return false;
-  });
-  if (!article) {
-    return res.status(404).json({
+  try {
+    const article = await Article.findById(req.params.id);
+
+    if (!article) {
+      return res.status(404).json({
+        status: 'fail',
+        message: 'not found',
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        article,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
       status: 'fail',
-      message: 'not found',
+      message: err.message,
     });
   }
-  res.status(200).json({
-    status: 'success',
-    data: {
-      article,
-    },
-  });
 };
 exports.createArticle = async (req, res) => {
-  if (!req.body.title || !req.body.author || !req.body.text) {
-    return res.status(404).json({
+  try {
+    const newArticle = await Article.create(req.body);
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        newArticle,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
       status: 'fail',
-      message: 'you must write title, name and text of article!',
+      message: err.message,
     });
   }
-  const article = req.body;
-  const articles = JSON.parse(
-    await readFilePro(`${__dirname}/../articles.json`, 'utf-8')
-  );
-  if (
-    articles.findIndex((item) => {
-      return item.title === req.body.title;
-    }) > -1
-  ) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'it is dublicate, change title',
-    });
-  }
-
-  articles.push(article);
-  await writeFilePro(`${__dirname}/../articles.json`, JSON.stringify(articles));
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      article,
-    },
-  });
 };
 exports.updateArticle = async (req, res) => {
-  const patch = req.body;
-  const articles = JSON.parse(
-    await readFilePro(`${__dirname}/../articles.json`, 'utf-8')
-  );
-  const article = articles.find((item) => {
-    return item.title === req.params.title;
-  });
-  const index = articles.findIndex((item) => {
-    return item.title === req.params.title;
-  });
-  if (index < 0) {
-    return res.status(404).json({
+  try {
+    const updatedArticle = await Article.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        updatedArticle,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
       status: 'fail',
-      message: 'not found article with this title',
+      message: err.message,
     });
   }
-
-  const newArticle = { ...article, ...patch };
-
-  articles.splice(index, 1, newArticle);
-  await writeFilePro(`${__dirname}/../articles.json`, JSON.stringify(articles));
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      newArticle,
-    },
-  });
 };
 exports.deleteArticle = async (req, res) => {
-  const { title } = req.params;
-  const articles = JSON.parse(
-    await readFilePro(`${__dirname}/../articles.json`, 'utf-8')
-  );
-  const index = articles.findIndex((item) => {
-    return item.title === title;
-  });
-  if (index < 0) {
-    return res.status(404).json({
+  try {
+    await Article.findByIdAndDelete(req.params.id);
+
+    res.status(204).json({
+      status: 'success',
+      data: null,
+    });
+  } catch (err) {
+    res.status(404).json({
       status: 'fail',
-      message: 'not found',
+      message: err.message,
     });
   }
-  articles.splice(index, 1);
-  await writeFilePro(`${__dirname}/../articles.json`, JSON.stringify(articles));
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
 };

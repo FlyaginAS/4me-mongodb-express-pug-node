@@ -27,13 +27,3 @@ app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`App running on port ${port}`);
 });
-
-//my code with models
-
-Article.create({
-  title: 'PUG about',
-  author: 'Alexander',
-  text: 'about pug',
-}).then((doc) => {
-  console.log(doc);
-});
