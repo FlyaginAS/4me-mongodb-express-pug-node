@@ -2,8 +2,14 @@ const Article = require('../models/articleModel');
 
 exports.getAllArticles = async (req, res) => {
   try {
-    const articles = await Article.find();
-
+    console.log(req.query);
+    const articles = await Article.find(req.query);
+    if (articles.length === 0) {
+      res.status(404).json({
+        status: 'fail',
+        message: 'not found',
+      });
+    }
     res.status(200).json({
       status: 'success',
       data: {
