@@ -1,13 +1,7 @@
-const fs = require('fs');
-const util = require('util');
-
-const readFilePro = util.promisify(fs.readFile);
-const writeFilePro = util.promisify(fs.writeFile);
+const Article = require('../models/articleModel');
 
 exports.getAllArticles = async (req, res) => {
-  const articles = JSON.parse(
-    await readFilePro(`${__dirname}/../articles.json`, 'utf-8')
-  );
+  const articles = await Article.find();
 
   res.status(200).json({
     status: 'success',

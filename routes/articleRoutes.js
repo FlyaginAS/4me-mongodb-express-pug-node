@@ -9,7 +9,7 @@ router
   .post(articleController.createArticle);
 
 router
-  .route('/:title')
+  .route('/:id')
   .get(articleController.getArticle)
   .patch(articleController.updateArticle)
   .delete(articleController.deleteArticle);

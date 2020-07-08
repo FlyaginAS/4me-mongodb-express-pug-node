@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 dotenv.config({ path: './config.env' });
 const app = require('./app');
+const Article = require('./models/articleModel');
 
 //**************************************************************************
 //connecting to the DB
@@ -27,35 +28,12 @@ app.listen(port, () => {
   console.log(`App running on port ${port}`);
 });
 
-const articleSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: [true, 'An article must have a title!'],
-    unique: true,
-  },
-  rating: Number,
-  author: {
-    type: String,
-    required: [true, 'An article must have an author!'],
-  },
-  text: {
-    type: String,
-    required: [true, 'An article must have a text'],
-  },
-});
+//my code with models
 
-const Article = mongoose.model('Article', articleSchema);
-
-const testArticle = new Article({
-  title: 'Learn HTML',
-  author: 'Alex',
-  text: 'This article about learning html',
+Article.create({
+  title: 'PUG about',
+  author: 'Alexander',
+  text: 'about pug',
+}).then((doc) => {
+  console.log(doc);
 });
-testArticle
-  .save()
-  .then((doc) => {
-    console.log(doc);
-  })
-  .catch((err) => {
-    console.log(err.message);
-  });
